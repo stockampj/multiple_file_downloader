@@ -1,36 +1,19 @@
 let links = document.querySelectorAll("a");
+let filteredLinks = [];
 links.forEach((link)=>{
   let id = link.id;
   if (id.slice(0,8)===`GridView`) {
-    console.log(id)
+    let targetId = $(`#${id}`)
+    filteredLinks.push(targetId);
   }
 })
+let interval= setInterval(clickFunction,3000,filteredLinks);
 
-
-// var urls = [
-//   'http://example.com/file1',
-//   'http://example.com/file2',
-//   'http://example.com/file3'
-// ]
-
-// var interval = setInterval(download, 300, urls);
-
-// function download(urls) {
-//   var url = urls.pop();
-
-//   var a = document.createElement("a");
-//   a.setAttribute('href', url);
-//   a.setAttribute('download', '');
-//   a.setAttribute('target', '_blank');
-//   a.click();
-
-//   if (urls.length == 0) {
-//     clearInterval(interval);
-//   }
-// }
-
-
-// $link = $('a:first');
-// $link.click()
-
-
+function clickFunction(filteredLinks) {
+  let node = filteredLinks.pop();
+  console.log(node);
+  node.click();
+  if (filteredLinks.length == 0) {
+    clearInterval(interval);
+  }
+}
