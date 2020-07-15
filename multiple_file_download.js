@@ -7,7 +7,7 @@ links.forEach((link)=>{
     filteredLinks.push(targetId);
   }
 })
-let interval= setInterval(clickFunction,3000,filteredLinks);
+let interval= setInterval(clickFunction,1500,filteredLinks);
 
 function clickFunction(filteredLinks) {
   let node = filteredLinks.pop();
