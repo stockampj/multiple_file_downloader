@@ -1,11 +1,11 @@
 //// This snippet selects all checkboxes and checks them ////
 
-function selectAllCheckboxes() {
-  Object.keys($( "[type=checkbox]" )).forEach((key)=>{
-    let checkbox = $( "[type=checkbox]" )[key];
-    if (checkbox.id  && checkbox.id.includes('chkSelectAll')) { checkbox.click();}
-  })
-}
+// function selectAllCheckboxes() {
+//   Object.keys($( "[type=checkbox]" )).forEach((key)=>{
+//     let checkbox = $( "[type=checkbox]" )[key];
+//     if (checkbox.id  && checkbox.id.includes('chkSelectAll')) { checkbox.click();}
+//   })
+// }
 
 // This snippet will gather all rows with docnames and format them into an Object//////////////////////////////
 
@@ -20,6 +20,7 @@ function gatherDocumentList() {
       let docName = row.children[2].children[0].outerText;
       let docCategory = row.children[2].children[1].outerText;
       let docCheckBoxId= row.children[0].children[0].children[0].id;
+      let docCheckBoxParent = row.children[0];
       let docLinkId = row.children[2].children[0].children[0].id;
       let pageCount = row.children[3].innerText;
       let uploadDate = row.children[6].children[0].innerText;
@@ -32,6 +33,7 @@ function gatherDocumentList() {
           docCategory: docCategory,
           docNameCategoryCombined: `${docName.toLowerCase()} ${docCategory.toLowerCase()}`,
           docCheckBoxId: docCheckBoxId,
+          docCheckBoxParent: docCheckBoxParent,
           docLinkId: docLinkId,
           pageCount: pageCount,
           uploadDate: uploadDate
@@ -44,28 +46,116 @@ function gatherDocumentList() {
   return documentList;
 }
 
-
-
-function findDocument(documentList, searchTerm, property) {
+function findDocument(documentList, searchTerms, property) {
   function termCleaner(string){
     return string.toLowerCase().replace(/[()]/gmi, "")
   }
   let keyResult = [];
-  let term = termCleaner(searchTerm);
-  let searchField= property;
-  console.log(searchField)
+  let searchField= property; 
   Object.keys(documentList).forEach((key)=>{
     let match = false;
-    let comparisonField = termCleaner(documentList[key][searchField]);
-    term.split(' ').forEach(word =>{
-      if (comparisonField.includes(word.trim())) {match = true;}
+    searchTerms.forEach((searchTerm)=>{
+      term = termCleaner(searchTerm);
+      let comparisonField = termCleaner(documentList[key][searchField]);
+      if (comparisonField.includes(term)) {match = true;}
     })
     if (match) {keyResult.push(key)};
   })
   return keyResult;
 }
 
-selectAllCheckboxes();
+function selectAllCheckboxes() {
+  Object.keys($( "[type=checkbox]" )).forEach((key)=>{
+    let checkbox = $( "[type=checkbox]" )[key];
+    if (checkbox.id  && checkbox.id.includes('chkSelectAll')) { checkbox.click();}
+  })
+};
+
+function selectDocument(documentList, key, value){
+  let targetId = documentList[key]['docCheckBoxId']
+  $(`#${targetId}`)[0].checked = value;
+};
+
+function changeRowColor(documentList, key, color) {
+  let targetId = documentList[key]['docRowId']
+  $(`#${targetId}`).css('background-color', color);
+};
+
+function changeCheckBoxBackground(documentList, key, color) {
+  let targetId = documentList[key]['docCheckBoxParent'];
+  targetId.style.backgroundColor = color; 
+}
+
+let deSelectList = [
+  'facing',
+  'key',
+  'letters',
+  'mls',
+  'commission',
+  'sales report',
+  'sign up',
+  'profile'
+]
+
+function filterOutDocuments (documentList, filterArray) {
+  let matches = findDocument(documentList, filterArray, "docNameCategoryCombined");
+  Object.keys(documentList).forEach((key)=>{
+    selectDocument(documentList, key, true)
+  })
+  matches.forEach(key=>{
+    selectDocument(documentList, key, false);
+    changeCheckBoxBackground(documentList, key, '#ffd9b3');
+  })
+}
+
+// function showMatches(documentList) {
+//   let matchArray = [];
+//   let oldKeys = [];
+//   Object.keys(documentList).forEach((key)=>{
+//     let targetDoc = documentList[key];
+//     // let {docName, docCategory, pageCount, docRowId} = documentList[key];
+//     Object.keys(documentList).forEach((comparisonKey)=>{
+
+//       console.log('hello')
+//       let comparisonDoc = documentList[comparisonKey];
+//       if ((key !== comparisonKey) && (oldKeys.includes(comparisonKey)===false)) {
+//         let pageCompare = (targetDoc[`pageCount`] === comparisonDoc[`pageCount`]) ? true: false;
+//         let categoryCompare = (targetDoc[`docCategory`] === comparisonDoc[`docCategory`]) ? true: false;
+//         function nameCompare (targetDoc, comparisonDoc) {
+//           let targetNameArray = targetDoc[`docName`];
+//           let targetCount = targetNameArray.length;
+//           let matchedWordsCount = 0;
+//           targetNameArray.forEach(word=>{
+//             if (comparisonDoc[`docName`].toLowerCase().trim() === word.toLowerCase().trim()){
+//               matchedWordsCount += 1;
+//             }
+//           })
+//           console.log(targetCount+' '+matchedWordsCount);
+
+//         }        
+        
+
+//       }
+//     })
+//   })
+// }
+
+function showMatches(documentList) {
+  let matchesArray = [];
+  let keys = Object.keys(documentList);
+  let count = keys.length;
+
+  while (keys.length>0){
+    let key = keys.pop();
+    let targetDocument = documentList[key];
+    let {docName, docCategory, pageCount, docRowId} = targetDocument;
+    console.log(key);
+    console.log(keys);
+    
+  }
+}
+
+
 let masterDocumentList = gatherDocumentList();
-let matches = findDocument(masterDocumentList, "agency", "docNameCategoryCombined");
-console.log(matches)
+filterOutDocuments(masterDocumentList, deSelectList);
+showMatches(masterDocumentList);
