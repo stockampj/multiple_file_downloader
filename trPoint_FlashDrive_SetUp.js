@@ -108,38 +108,6 @@ function filterOutDocuments (documentList, filterArray) {
   })
 }
 
-// function showMatches(documentList) {
-//   let matchArray = [];
-//   let oldKeys = [];
-//   Object.keys(documentList).forEach((key)=>{
-//     let targetDoc = documentList[key];
-//     // let {docName, docCategory, pageCount, docRowId} = documentList[key];
-//     Object.keys(documentList).forEach((comparisonKey)=>{
-
-//       console.log('hello')
-//       let comparisonDoc = documentList[comparisonKey];
-//       if ((key !== comparisonKey) && (oldKeys.includes(comparisonKey)===false)) {
-//         let pageCompare = (targetDoc[`pageCount`] === comparisonDoc[`pageCount`]) ? true: false;
-//         let categoryCompare = (targetDoc[`docCategory`] === comparisonDoc[`docCategory`]) ? true: false;
-//         function nameCompare (targetDoc, comparisonDoc) {
-//           let targetNameArray = targetDoc[`docName`];
-//           let targetCount = targetNameArray.length;
-//           let matchedWordsCount = 0;
-//           targetNameArray.forEach(word=>{
-//             if (comparisonDoc[`docName`].toLowerCase().trim() === word.toLowerCase().trim()){
-//               matchedWordsCount += 1;
-//             }
-//           })
-//           console.log(targetCount+' '+matchedWordsCount);
-
-//         }        
-        
-
-//       }
-//     })
-//   })
-// }
-
 function showMatches(documentList) {
   let matchesArray = [];
   let keys = Object.keys(documentList);
@@ -149,13 +117,54 @@ function showMatches(documentList) {
     let key = keys.pop();
     let targetDocument = documentList[key];
     let {docName, docCategory, pageCount, docRowId} = targetDocument;
-    console.log(key);
-    console.log(keys);
-    
-  }
+    keys.forEach(comparisonKey=>{
+      let comparisonDoc = documentList[comparisonKey];
+      let docNameComparison = comparisonDoc[`docName`];
+      let docCategoryComparison = comparisonDoc[`docCategory`];
+      let pageCountComparison = comparisonDoc[`pageCount`];
+      let docRowIdComparison = comparisonDoc[`docRowId`];
+      let pageCompare = (pageCount === pageCountComparison) ? true: false;
+      let categoryCompare = (docCategory === docCategoryComparison) ? true: false;
+      let nameCompare = false;
+      
+      if (pageCompare===true || categoryCompare === true){
+        let nameArray = docName.toLowerCase().replace(/[_-]/gi, ' ').replace(/[()]/, '').split(' ').filter(word => word !== '');
+        let comparisonNameArray = docNameComparison.toLowerCase().replace(/[_-]/gi, ' ').replace(/[()]/, '').split(' ').filter(word => word !== '');
+        let nameCount = (nameArray.length<comparisonNameArray.length) ? nameArray.length : comparisonNameArray.length;
+        let matchedWordsCount = 0;
+        nameArray.forEach(targetWord=>{
+          if (comparisonNameArray.includes(targetWord)){
+            matchedWordsCount += 1
+          }
+        })
+        nameCompare = (matchedWordsCount/nameCount>=.5) ? true : false;
+      }
+      let positiveTestCount = [pageCompare, categoryCompare, nameCompare].filter(comparison => comparison === true).length;
+      if (positiveTestCount>1){
+        if (!matchesArray.includes(key)){matchesArray.push(key);}
+        if (!matchesArray.includes(comparisonKey)){matchesArray.push(comparisonKey);}
+      }
+
+
+      // if (categoryCompare === true){
+      //   console.log(`key: ${comparisonKey}`)
+      //   console.log(`pageCompare ${pageCompare}`)
+      //   console.log(`catCompare ${categoryCompare}`)
+      // };
+    });;
+  };
+  return matchesArray;
+};
+
+function markMatches(documentList){
+  let matchArray = showMatches(documentList);
+  matchArray.forEach(match=>{
+    changeRowColor(documentList, match, 'yellow')
+  })
 }
 
 
 let masterDocumentList = gatherDocumentList();
 filterOutDocuments(masterDocumentList, deSelectList);
-showMatches(masterDocumentList);
+markMatches(masterDocumentList);
+// showMatches(masterDocumentList);
