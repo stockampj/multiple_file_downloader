@@ -113,6 +113,8 @@ function showMatches(documentList) {
   let keys = Object.keys(documentList);
   let count = keys.length;
 
+  let flagWords = ['listing', 'seller', 'selling', 'buyer'];
+
   while (keys.length>0){
     let key = keys.pop();
     let targetDocument = documentList[key];
@@ -125,11 +127,12 @@ function showMatches(documentList) {
       let docRowIdComparison = comparisonDoc[`docRowId`];
       let pageCompare = (pageCount === pageCountComparison) ? true: false;
       let categoryCompare = (docCategory === docCategoryComparison) ? true: false;
+      let flagWordFail;
       let nameCompare = false;
       
       if (pageCompare===true || categoryCompare === true){
-        let nameArray = docName.toLowerCase().replace(/[_-]/gi, ' ').replace(/[()]/, '').split(' ').filter(word => word !== '');
-        let comparisonNameArray = docNameComparison.toLowerCase().replace(/[_-]/gi, ' ').replace(/[()]/, '').split(' ').filter(word => word !== '');
+        let nameArray = docName.toLowerCase().replace(/[_-]/gi, ' ').replace(/[()]\'/, '').split(' ').filter(word => word !== '');
+        let comparisonNameArray = docNameComparison.toLowerCase().replace(/[_-]/gi, ' ').replace(/[()]\'/, '').split(' ').filter(word => word !== '');
         let nameCount = (nameArray.length<comparisonNameArray.length) ? nameArray.length : comparisonNameArray.length;
         let matchedWordsCount = 0;
         nameArray.forEach(targetWord=>{
@@ -137,12 +140,34 @@ function showMatches(documentList) {
             matchedWordsCount += 1
           }
         })
-        nameCompare = (matchedWordsCount/nameCount>=.5) ? true : false;
+        let matchPercentage = matchedWordsCount/nameCount;
+        nameCompare = (matchPercentage>=.5) ? true : false;
+
+        if (matchPercentage>=.5) {
+          let flagWordNotInBothCount = 0;
+          flagWords.forEach(flagWord=>{
+            if (nameArray.includes(flagWord) || comparisonNameArray.includes(flagWord)) {
+              ((nameArray.includes(flagWord) && !comparisonNameArray.includes(flagWord)) || (!nameArray.includes(flagWord) && comparisonNameArray.includes(flagWord))) ? flagWordNotInBothCount+=1: flagWordNotInBothCount+=0;
+            };
+          })
+          flagWordFail = (flagWordNotInBothCount>0) ?  true: false;
+        } else {
+          flagWordFail = false;
+        }
       }
       let positiveTestCount = [pageCompare, categoryCompare, nameCompare].filter(comparison => comparison === true).length;
-      if (positiveTestCount>1){
+
+      if (positiveTestCount>1 && flagWordFail === false){
         if (!matchesArray.includes(key)){matchesArray.push(key);}
         if (!matchesArray.includes(comparisonKey)){matchesArray.push(comparisonKey);}
+
+        console.log(`----------------`)
+        console.log(docName)
+        console.log(docNameComparison)
+        console.log(`pageCompare ${pageCompare}`)
+        console.log(`categoryCompare ${categoryCompare}`)
+        console.log(`nameCompare ${nameCompare}`)
+        console.log(`flagWordFail ${flagWordFail}`)
       }
 
 
@@ -161,6 +186,7 @@ function markMatches(documentList){
   matchArray.forEach(match=>{
     changeRowColor(documentList, match, 'yellow')
   })
+  console.log(matchArray)
 }
 
 
