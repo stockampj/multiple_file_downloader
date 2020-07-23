@@ -146,8 +146,10 @@ function showMatches(documentList) {
         if (matchPercentage>=.5) {
           let flagWordNotInBothCount = 0;
           flagWords.forEach(flagWord=>{
-            if (nameArray.includes(flagWord) || comparisonNameArray.includes(flagWord)) {
-              ((nameArray.includes(flagWord) && !comparisonNameArray.includes(flagWord)) || (!nameArray.includes(flagWord) && comparisonNameArray.includes(flagWord))) ? flagWordNotInBothCount+=1: flagWordNotInBothCount+=0;
+            let targetFlagPresence = nameArray.includes(flagWord);
+            let comparisonFlagPresence = comparisonNameArray.includes(flagWord);
+            if (targetFlagPresence || comparisonFlagPresence) {
+              ((targetFlagPresence && !comparisonFlagPresence) || (!targetFlagPresence && comparisonFlagPresence)) ? flagWordNotInBothCount+=1: flagWordNotInBothCount+=0;
             };
           })
           flagWordFail = (flagWordNotInBothCount>0) ?  true: false;
@@ -190,7 +192,40 @@ function markMatches(documentList){
 }
 
 
-let masterDocumentList = gatherDocumentList();
-filterOutDocuments(masterDocumentList, deSelectList);
-markMatches(masterDocumentList);
-// showMatches(masterDocumentList);
+// let masterDocumentList = gatherDocumentList();
+// filterOutDocuments(masterDocumentList, deSelectList);
+// markMatches(masterDocumentList);
+
+
+
+
+function addFlashDrivePanel() {
+  let jqTarget = $('#flashdrive-tools')[0]
+  if (jqTarget === undefined){
+    function buttonScript(){
+      let masterDocumentList = gatherDocumentList();
+      filterOutDocuments(masterDocumentList, deSelectList);
+      markMatches(masterDocumentList);
+    }
+    let tableTarget = $('.panel-body')[0];
+    console.log(tableTarget)
+    let newRow = document.createElement('DIV');
+    newRow.id ='flashdrive-tools';
+    tableTarget.append(newRow)
+    jqTarget = $('#flashdrive-tools')[0] 
+    jqTarget.innerHTML = `<button id="flashdrive-button" class="btn btn-primary">Filter for FlashDrives</button>`;
+
+    console.log($("#flashdrive-button")[0])
+    $("#flashdrive-button")[0].addEventListener("click", function(event){
+      event.preventDefault()
+      buttonScript();
+    });
+
+    console.log(jqTarget);
+  } else {
+    console.log('no need')
+  }
+}
+
+addFlashDrivePanel();
+
