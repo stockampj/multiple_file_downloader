@@ -104,7 +104,7 @@ function filterOutDocuments (documentList, filterArray) {
   })
   matches.forEach(key=>{
     selectDocument(documentList, key, false);
-    changeCheckBoxBackground(documentList, key, '#ffd9b3');
+    changeCheckBoxBackground(documentList, key, 'rgb(200, 200, 200)');
   })
 }
 
@@ -186,9 +186,9 @@ function showMatches(documentList) {
 function markMatches(documentList){
   let matchArray = showMatches(documentList);
   matchArray.forEach(match=>{
-    changeRowColor(documentList, match, 'yellow')
+    changeRowColor(documentList, match, 'rgba(191, 189, 63, 0.24)')
   })
-  console.log(matchArray)
+  // console.log(matchArray)
 }
 
 
@@ -214,18 +214,13 @@ function addFlashDrivePanel() {
     tableTarget.append(newRow)
     jqTarget = $('#flashdrive-tools')[0] 
     jqTarget.innerHTML = `<button id="flashdrive-button" class="btn btn-primary">Filter for FlashDrives</button>`;
-
-    console.log($("#flashdrive-button")[0])
     $("#flashdrive-button")[0].addEventListener("click", function(event){
       event.preventDefault()
       buttonScript();
     });
-
-    console.log(jqTarget);
-  } else {
-    console.log('no need')
-  }
-}
+    $('#flashdrive-button').css("margin", "5px 0px 5px 0px");
+  };
+};
 
 addFlashDrivePanel();
 
