@@ -90,11 +90,12 @@ let deSelectList = [
   'facing',
   'key',
   'letters',
-  'mls',
+  'mls printout',
   'commission',
   'sales report',
   'sign up',
-  'profile'
+  'profile',
+  'referral'
 ]
 
 function filterOutDocuments (documentList, filterArray) {
@@ -105,6 +106,7 @@ function filterOutDocuments (documentList, filterArray) {
   matches.forEach(key=>{
     selectDocument(documentList, key, false);
     changeCheckBoxBackground(documentList, key, 'rgb(200, 200, 200)');
+    changeRowColor(documentList, key, 'white')
   })
 }
 
@@ -204,8 +206,8 @@ function addFlashDrivePanel() {
   if (jqTarget === undefined){
     function buttonScript(){
       let masterDocumentList = gatherDocumentList();
-      filterOutDocuments(masterDocumentList, deSelectList);
       markMatches(masterDocumentList);
+      filterOutDocuments(masterDocumentList, deSelectList);
     }
     let tableTarget = $('.panel-body')[0];
     console.log(tableTarget)

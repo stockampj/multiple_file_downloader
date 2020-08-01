@@ -7,13 +7,19 @@ links.forEach((link)=>{
     filteredLinks.push(targetId);
   }
 })
+console.log(filteredLinks.length);
+
 let interval= setInterval(clickFunction,1500,filteredLinks);
+
+let count = 0;
 
 function clickFunction(filteredLinks) {
   let node = filteredLinks.pop();
-  console.log(node);
+  // console.log(node);
+  count +=1;
   node.click();
   if (filteredLinks.length == 0) {
+    console.log(count)
     clearInterval(interval);
   }
 }
